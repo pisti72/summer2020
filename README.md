@@ -5,7 +5,7 @@ More different projects come here
 2020-06-22 Mon Balatonkenese
 2020-06-23 Tue Balatonkenese
 2020-06-24 Wed Started http://sohervagyok.epizy.com
-2020-06-25 Thu
+2020-06-25 Thu Login and expense works
 2020-06-26 Fri
 2020-06-27 Sat
 2020-06-28 Sun

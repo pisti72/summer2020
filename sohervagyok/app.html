@@ -1,58 +1,3 @@
-<?php
-require 'connect.php';
-
-// sql to create table
-$sql = "CREATE TABLE IF NOT EXISTS Users (
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(30) NOT NULL,
-    password VARCHAR(64) NOT NULL,
-    email VARCHAR(50),
-    hashcode VARCHAR(64) NOT NULL,
-    reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )";
-
-if ($conn->query($sql) === TRUE) {
-    //$message .= "Table Users created successfully <br>";
-  } else {
-    //echo "Error creating table: " . $conn->error;
-  }
-
-if ($_POST["name"] and $_POST['password'] and $_POST['submit'] == 'Login') {
-    //echo '<br>Check login';
-    $name = $_POST['name'];
-    $password = md5($_POST['password']);
-    $sql = "SELECT hashcode FROM Users WHERE name='$name' AND password='$password'";
-    //echo $sql;
-    $result = $conn->query($sql);
-
-    if ($result->num_rows > 0) {
-        // output data of each row
-        while($row = $result->fetch_assoc()) {
-            $hashcode = $row["hashcode"];
-        }
-    }
-}
-
-if ($_POST["name"] and $_POST['password'] == $_POST['passwordagain'] and $_POST['email'] and $_POST['submit'] == 'Register') {
-    //echo '<br>Register users';
-    $name = $_POST['name'];
-    $password = md5($_POST['password']);
-    $email = $_POST['email'];
-    $hashcode = md5($name.$password.$email);
-    //Check does user exist
-    //Insert user
-    $sql = "INSERT INTO Users (name, password, email, hashcode) VALUES ('$name', '$password', '$email', '$hashcode')";
-    if ($conn->query($sql) === TRUE) {
-        $message .= "User added<br>";
-    } else {
-        $message .= "User not added<br>";
-    }
-}
-
-
-
-mysqli_close($conn); 
-?>
 <!DOCTYPE html>
 <html>
 
@@ -112,9 +57,9 @@ mysqli_close($conn);
 
                 <div class="w3-container w3-padding w3-margin">
                     <label>Amount</label>
-                    <input class="w3-input w3-border" type="number" id="amountIncome">
+                    <input class="w3-input w3-border" type="number">
                     <label>Comment</label>
-                    <input class="w3-input w3-border" type="text" id="commentIncome">
+                    <input class="w3-input w3-border" type="text">
                     <button class="w3-btn w3-blue w3-margin" onclick="income()">Send</button>
                 </div>
 
@@ -122,7 +67,9 @@ mysqli_close($conn);
 
         </div>
 
-        <ul class="w3-card w3-ul" id="list">
+        <ul class="w3-card w3-ul">
+            <li class="w3-bar">10</li>
+            <li class="w3-bar">20</li>
         </ul>
 
     </div>
@@ -141,10 +88,6 @@ mysqli_close($conn);
     <div id="loader">
         <div id="circle"></div>
     </div>
-
-    <footer class="w3-container w3-dark-grey">
-        <p id="version"></p>
-    </footer>
 
     <script src="app.js"></script>
 </body>
