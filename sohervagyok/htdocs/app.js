@@ -13,7 +13,7 @@ function onload2() {
     }
 
     hide('income');
-    
+
 }
 
 function closeSuccess() {
@@ -49,11 +49,16 @@ async function history() {
         result.items[i].balance = balance;
     }
     for (var i = 0; i < result.items.length; i++) {
+        var amount = new Intl.NumberFormat().format(result.items[i].amount);
+        var balance = new Intl.NumberFormat().format(result.items[i].balance);
         list += '<li class="w3-bar">'
-            + result.items[i].amount + ' - '
-            + result.items[i].comment + ' - '
-            + result.items[i].date + ' - '
-            + result.items[i].balance + '</li>';
+            + '<div class="w3-row">'
+            + '<div class="w3-quarter w3-container w3-right-align">' + amount + '</div>'
+            + '<div class="w3-quarter w3-container">' + result.items[i].comment + '</div>'
+            + '<div class="w3-quarter w3-container">' + result.items[i].date + '</div>'
+            + '<div class="w3-quarter w3-container w3-right-align">' + balance + '</div>'
+            + '</div>'
+            + '</li>';
     }
 
     f('list').innerHTML = list;
