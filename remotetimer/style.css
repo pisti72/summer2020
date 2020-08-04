@@ -101,12 +101,11 @@ button {
 }
 
 #message {
-    position: absolute;
-    padding: 40px;
-    background-color: rgba(255, 255, 128, 1);
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
+    /*position: absolute;*/
+    background-color: #FF8;
+    /*top: 50%;*/
+    /*left: 50%;*/
+    /*transform: translate(-50%, -50%);*/
     text-align: center;
 }
 

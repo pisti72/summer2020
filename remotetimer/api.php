@@ -1,10 +1,16 @@
 <?php
 
+include 'config.php';
+
 $response = array();
 
 global $mysqli;
-//$mysqli = new mysqli("c199um.forpsi.com", "b14304", "H3MFdnN","b14304","3306");
-$mysqli = new mysqli("localhost", "root", "", "remotetimer", "3306");
+$mysqli = new mysqli(
+    $config[$env]['host'],
+    $config[$env]['user'], 
+    $config[$env]['password'],
+    $config[$env]['database'],
+    $config[$env]['port']);
 
 /* check connection */
 if (mysqli_connect_errno()) {
@@ -80,6 +86,23 @@ if (isset($_GET['command'], $_GET['token'])) {
     }
 }
 
+//called by god
+if (isset($_GET['all'])) {
+    $array = array();
+    $query = "SELECT name, timestring FROM remotetimer_timers WHERE user_id IS NOT NULL";
+    if ($result = $mysqli->query($query)) {
+        while ($row = $result->fetch_row()) {
+            $elem['name'] = $row[0];
+            $elem['time'] = $row[1];
+            array_push($array, $elem);
+        }
+        $response['result'] = 'success';
+        $response['timers'] = $array;
+    }else {
+        $response['result'] = 'failed';
+    }
+}
+
 //called by user registration
 $request_body = file_get_contents('php://input');
 $data = json_decode($request_body);
@@ -106,7 +129,6 @@ if (isset($data)) {
         $name = $data->name;
         $id = 9999;
         $query = "SELECT id, name, token FROM remotetimer_users WHERE (name = '$name' OR email = '$name') AND password='$password'";
-        //$response['sql'] = $query;
         if ($result = $mysqli->query($query)) {
             if ($row = $result->fetch_row()) {
                 $response['result'] = 'success';
@@ -122,15 +144,32 @@ if (isset($data)) {
                     array_push($names, $row[0]);
                     array_push($tokens, $row[1]);
                 }
-                //$response['timers'] = json_encode($tokens);
                 $response['timers'] = $tokens;
                 $response['names'] = $names;
             }
         } else {
             $response['result'] = 'failed';
         }
-        //$response['name'] = $data->name;
     }
+}
+
+if(isset($_GET['hash'])){
+    $response['result'] = 'success';
+    $response['number'] = getHash18();
+}
+
+function getHash18() {
+    $n = '';
+    for($i=0;$i<18;$i++){
+        $rand = rand(0,35);
+        if($rand>=0 && $rand<=9){
+            $rand += 48;
+        }else{
+            $rand += 55;
+        }
+        $n .= chr($rand);
+    }
+    return $n;
 }
 
 /* send back the result */

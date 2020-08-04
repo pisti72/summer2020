@@ -1,6 +1,6 @@
 const STATE_HALT = 0;
 const api = './api.php';
-const tick = 5;
+const tick = 48;
 var state = STATE_HALT;
 var endTime = 0;
 var counter = 0;
@@ -9,13 +9,8 @@ var date = {};
 var paused = false;
 var pausedAt = 0;
 
-init();
-
-function init(){
-    getStyle();
-    //setInterval('update()',95);
-    update();
-}
+getStyle();
+window.requestAnimationFrame(update);
 
 function checkServer() {
     if (counter % tick == 0) {
@@ -139,7 +134,7 @@ function update() {
     checkServer();
     timeString = getSixDigits(time);
     setDigits(time);
-    requestAnimationFrame(update);
+    window.requestAnimationFrame(update);
 }
 
 function getSixDigits(time) {
