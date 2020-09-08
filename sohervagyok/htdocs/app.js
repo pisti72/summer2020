@@ -1,4 +1,4 @@
-const api = '/service.php';
+const api = './service.php';
 var token = '';
 var version = 10;
 function onload2() {
@@ -48,7 +48,13 @@ async function history() {
         balance += parseInt(result.items[i].amount);
         result.items[i].balance = balance;
     }
-    for (var i = 0; i < result.items.length; i++) {
+
+    var rows = result.items.length;
+    if(rows > 10) {
+        rows = 10;
+    }
+
+    for (var i = 0; i < rows; i++) {
         var amount = new Intl.NumberFormat().format(result.items[i].amount);
         var balance = new Intl.NumberFormat().format(result.items[i].balance);
         list += '<li class="w3-bar">'

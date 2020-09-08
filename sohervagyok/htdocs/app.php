@@ -1,7 +1,9 @@
 <?php
 require 'connect.php';
 
-// sql to create table
+$hashcode="";//initial value
+
+// sql to create the user table
 $sql = "CREATE TABLE IF NOT EXISTS Users (
     id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(30) NOT NULL,
@@ -17,7 +19,20 @@ if ($conn->query($sql) === TRUE) {
     //echo "Error creating table: " . $conn->error;
   }
 
-if ($_POST["name"] and $_POST['password'] and $_POST['submit'] == 'Login') {
+if (isset($_GET["id"])) {
+    $id = $_GET["id"];
+    $sql = "SELECT hashcode FROM Users WHERE hashcode='$id'";
+    $result = $conn->query($sql);
+
+    if ($result->num_rows > 0) {
+        // output data of each row
+        while($row = $result->fetch_assoc()) {
+            $hashcode = $row["hashcode"];
+        }
+    }
+}
+
+if (isset($_POST["name"],$_POST['password'],$_POST["submit"]) and $_POST['submit'] == 'Login') {
     //echo '<br>Check login';
     $name = $_POST['name'];
     $password = md5($_POST['password']);
@@ -33,7 +48,8 @@ if ($_POST["name"] and $_POST['password'] and $_POST['submit'] == 'Login') {
     }
 }
 
-if ($_POST["name"] and $_POST['password'] == $_POST['passwordagain'] and $_POST['email'] and $_POST['submit'] == 'Register') {
+if (isset($_POST["name"],$_POST['password'],$_POST['passwordagain'],$_POST['email'],$_POST['submit']) and 
+    $_POST['password'] == $_POST['passwordagain'] and $_POST['email'] and $_POST['submit'] == 'Register') {
     //echo '<br>Register users';
     $name = $_POST['name'];
     $password = md5($_POST['password']);
@@ -78,7 +94,7 @@ mysqli_close($conn);
             <p>You are logged in</p>
         </div>
 
-        <div class="container" id="expense">
+        <div class="w3-container" id="expense">
             <div class="w3-card">
 
                 <div class="w3-container w3-orange">
@@ -100,7 +116,7 @@ mysqli_close($conn);
             </div>
         </div>
 
-        <div class="container" id="income">
+        <div class="w3-container" id="income">
             <div class="w3-container w3-margin">
                 <button class="w3-btn w3-orange" onclick="openExpense()">Expense</button>
             </div>
@@ -121,21 +137,25 @@ mysqli_close($conn);
             </div>
 
         </div>
+        <!--here comes the list-->
+        <div class="w3-container">
+            <ul class="w3-card w3-ul" id="list">
+            </ul>
+        </div>
 
-        <ul class="w3-card w3-ul" id="list">
-        </ul>
-
+        <div class="w3-container w3-margin">
+            <a href="getcsv.php?id=<?php echo $hashcode; ?>"><img src="csv.png"/></a>
+            <a href="app.php?id=<?php echo $hashcode; ?>"><img src="share.png"/></a>
+        </div>
     </div>
 
     <div id="error" class="w3-container w3-margin">
-
         <div class="w3-panel w3-red w3-display-container">
             <span onclick="closeError()"
                 class="w3-button w3-large w3-display-topright">×</span>
             <h3>Error</h3>
             <p>You are not logged in</p>
         </div>
-
     </div>
 
     <div id="loader">

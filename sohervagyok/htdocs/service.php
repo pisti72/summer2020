@@ -10,9 +10,10 @@ function getHistory($id, $conn) {
       // output data of each row
       while($row = $result->fetch_assoc()) {
           unset($element);
-          $element->amount = $row["amount"];
-          $element->comment = $row["comment"];
-          $element->date = $row["reg_date"];
+          $element=array();
+          $element["amount"] = $row["amount"];
+          $element["comment"] = $row["comment"];
+          $element["date"] = $row["reg_date"];
           $array[] = $element;
       }
   }
@@ -37,29 +38,47 @@ function getUserId($token, $conn) {
 }
 
 $_POST = json_decode(file_get_contents('php://input'), true);
+ 
+$response = array("success" => FALSE);
 
-$response->success = FALSE;
+//$response->success = FALSE;
 
 
 
 // sql to create table
-$sql = "CREATE TABLE IF NOT EXISTS Expenses (
-    id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    amount VARCHAR(30) NOT NULL,
-    comment VARCHAR(64),
-    user_id INT(6) NOT NULL,
-    reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )";
+if(isset($_POST['token'])){
+  $sql = "CREATE TABLE IF NOT EXISTS Expenses (
+      id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+      amount VARCHAR(30) NOT NULL,
+      comment VARCHAR(64),
+      user_id INT(6) NOT NULL,
+      reg_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      )";
 
-if ($conn->query($sql) === TRUE) {
-  //$message .= "Table Users created successfully <br>";
-} else {
-  //echo "Error creating table: " . $conn->error;
+  if ($conn->query($sql) === TRUE) {
+    $sql = "SELECT * FROM Expenses WHERE 1";
+    $result = $conn->query($sql);
+    if($result->num_rows == 0) {
+      $amount = 0;
+      $comment = 'Welcome user';
+      $token = $_POST['token'];
+      $user_id = getUserId($token, $conn);
+      $sql = "INSERT INTO Expenses (amount, comment, user_id) VALUES ('$amount', '$comment', '$user_id')";
+        if ($conn->query($sql) === TRUE) {
+            $message .= "Expense added<br>";
+        } else {
+            $message .= "Expense not added<br>";
+        }
+      }
+    //$message .= "Table Users created successfully <br>";
+  } else {
+    //echo "Error creating table: " . $conn->error;
+  }
 }
 
-if ($_POST["amount"] and $_POST['token'] and $_POST['comment'] and  $_POST['command'] == 'expense') {
+if (isset($_POST["amount"], $_POST['token'], $_POST['comment'], $_POST['command']) and $_POST['command'] == 'expense') {
   //echo '<br>Check login';
-  $response->success = 'inserted';
+  $response['success'] = 'inserted';
   $amount = $_POST['amount'];
   $token = $_POST['token'];
   $comment = $_POST['comment'];
@@ -76,9 +95,9 @@ if ($_POST["amount"] and $_POST['token'] and $_POST['comment'] and  $_POST['comm
   }
 }
 
-if ($_POST["amount"] and $_POST['token'] and $_POST['comment'] and  $_POST['command'] == 'income') {
+if (isset($_POST["amount"], $_POST['token'], $_POST['comment'], $_POST['command']) and $_POST['command'] == 'income') {
   //echo '<br>Check login';
-  $response->success = 'inserted';
+  $response['success'] = 'inserted';
   $amount = $_POST['amount'];
   $token = $_POST['token'];
   $comment = $_POST['comment'];
@@ -95,11 +114,11 @@ if ($_POST["amount"] and $_POST['token'] and $_POST['comment'] and  $_POST['comm
   }
 }
 
-if ($_POST["token"] and $_POST["command"] == "history") {
-  $response->success = 'got history';
+if (isset($_POST["token"], $_POST["command"]) and $_POST["command"] == "history") {
+  $response['success'] = 'got history';
   $token = $_POST['token'];
   $user_id = getUserId($token, $conn);
-  $response->items = getHistory($user_id, $conn);
+  $response['items'] = getHistory($user_id, $conn);
 }
 
 echo json_encode($response);
