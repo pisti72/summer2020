@@ -1,5 +1,6 @@
 <?php
 require 'connect.php';
+require 'functions.php';
 
 $hashcode="";//initial value
 
@@ -56,13 +57,23 @@ if (isset($_POST["name"],$_POST['password'],$_POST['passwordagain'],$_POST['emai
     $email = $_POST['email'];
     $hashcode = md5($name.$password.$email);
     //Check does user exist
+    //Check password is same
+    //Check is mail valid
     //Insert user
     $sql = "INSERT INTO Users (name, password, email, hashcode) VALUES ('$name', '$password', '$email', '$hashcode')";
     if ($conn->query($sql) === TRUE) {
-        $message .= "User added<br>";
-    } else {
-        $message .= "User not added<br>";
+        $amount = 0;
+        $comment = 'Welcome user';
+        $user_id = getUserId($hashcode, $conn);
+        $sql = "INSERT INTO Expenses (amount, comment, user_id) VALUES ('$amount', '$comment', '$user_id')";
+        if ($conn->query($sql) === TRUE) {
+            $message .= "Expense added<br>";
+        } else {
+            $message .= "Expense not added<br>";
+        }
     }
+    $message .= "User added<br>";
+
 }
 
 
@@ -76,6 +87,7 @@ mysqli_close($conn);
     <title>Expenses</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
     <link rel="stylesheet" type="text/css" href="mystyle.css">
     <meta charset="UTF-8">
     <script>var hashcode = '<?php echo $hashcode; ?>';</script>
@@ -143,6 +155,12 @@ mysqli_close($conn);
             </ul>
         </div>
 
+        <!--Chart-->
+        <div class="w3-container">
+            <canvas id="myChart"></canvas>
+        </div>
+
+        <!--link buttons-->
         <div class="w3-container w3-margin">
             <a href="getcsv.php?id=<?php echo $hashcode; ?>"><img src="csv.png"/></a>
             <a href="app.php?id=<?php echo $hashcode; ?>"><img src="share.png"/></a>
@@ -158,6 +176,17 @@ mysqli_close($conn);
         </div>
     </div>
 
+    <div class="w3-hide">
+        <li class="w3-bar" id="balance_row">
+            <div class="w3-row">
+                <div class="w3-quarter w3-container w3-right-align"></div>
+                <div class="w3-quarter w3-container"></div>
+                <div class="w3-quarter w3-container"></div>
+                <div class="w3-quarter w3-container w3-right-align"></div>
+            </div>
+        </li>
+    </div>
+
     <div id="loader">
         <div id="circle"></div>
     </div>
@@ -166,7 +195,7 @@ mysqli_close($conn);
         <p id="version"></p>
     </footer>
 
-    <script src="app.js"></script>
+    <script src="app2020091603.js"></script>
 </body>
 
 </html>

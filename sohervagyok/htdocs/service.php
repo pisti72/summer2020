@@ -1,5 +1,6 @@
 <?php
 require 'connect.php';
+require 'functions.php';
 
 function getHistory($id, $conn) {
   //Get the list by user
@@ -18,23 +19,6 @@ function getHistory($id, $conn) {
       }
   }
   return $array;
-}
-
-$faszom = 1;
-
-function getUserId($token, $conn) {
-  //Get user by token
-  $sql = "SELECT id FROM Users WHERE hashcode='$token'";
-  //echo $sql;
-  $result = $conn->query($sql);
-  $id = '';
-  if ($result->num_rows > 0) {
-      // output data of each row
-      while($row = $result->fetch_assoc()) {
-          $id = $row["id"];
-      }
-  }
-  return $id;
 }
 
 $_POST = json_decode(file_get_contents('php://input'), true);
